@@ -50,7 +50,8 @@ public class Cartas {
         for(int i =0; i < oCartas.length; i++){
             vCarta = clMazo[(int)(Math.random()*52)];
             int aux = 0;
-            vCarta.setEstadoCarta("1");
+            if(i==0) vCarta.setEstadoCarta("2");
+            else vCarta.setEstadoCarta("1");
             oCartas[i] = vCarta;
         }
         return oCartas;

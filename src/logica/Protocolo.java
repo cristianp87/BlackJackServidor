@@ -30,11 +30,20 @@ package logica;
                 PARAMETROS:
                 YYYYMMDDHHMMSS -> Ultima fecha de conexion 
           1 ->  En linea
-          2 ->  No registrado
     PC = Pedir Carta
           PARAMETROS:
           XXX -> Codigo del usuario al que se debe enviar el mensaje
           XXX.... -> Mensaje
+        RESPUESTAS:
+          0 ->  No conectado.
+                PARAMETROS:
+                YYYYMMDDHHMMSS -> Ultima fecha de conexion 
+          1 ->  En linea
+    PLJ = Plantar Jugador
+        PARAMETROS:
+          XXX -> Codigo del usuario al que se debe enviar el mensaje
+          XXX.... -> Mensaje
+
     NPC = No Pedir Carta
           PARAMETROS:
           X -> Estado entrega del mensaje

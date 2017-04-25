@@ -109,16 +109,16 @@ public class ClienteServidor extends Thread {
                                           clCartasRep[1].getNombreCarta() +
                                           clCartasRep[1].getEstadoCarta() +
                                           clCartasRep[1].getValorCarta()  +
-                                          "CENR"+
+                                          "INJR"+
                                           protocolo.getMensajeUser();
-                    dosur.writeUTF(nuevoMensaje);
+                    dosur.writeUTF(mensajeRegreso);
                 }
                 
                  String estadoMensajeInterno="";
                 if(SocketServidor.listaClientes.get(protocolo.getIdentUserRecep()) == null)
-                    estadoMensajeInterno="CEN0";
+                    estadoMensajeInterno="INJ0";
                 else
-                    estadoMensajeInterno="CEN1";
+                    estadoMensajeInterno="INJ1";
                     Cartas clCartasEm = new Cartas();
                     Cartas[] clMazoEm = new Cartas[52];
                     Cartas[] clCartasRepEm = new Cartas[2];
@@ -161,7 +161,7 @@ public class ClienteServidor extends Thread {
                                           clCartasRep.getValorCarta()  +
                                           "PCR"+
                                           protocolo.getMensajeUser();
-                    dosur.writeUTF(nuevoMensaje);
+                    dosur.writeUTF(mensajeRegresoPC);
                 }
                 
                 String estadoMensajeInternoPc ="";
@@ -184,14 +184,27 @@ public class ClienteServidor extends Thread {
                 
                 break;    
             case "IEJ":
+                if(SocketServidor.listaClientes.get(protocolo.getIdentUserConect()) != null)
+                {          
+                    Clientes clRecepIEL=(Clientes)SocketServidor.listaClientes.get(protocolo.getIdentUserConect());
+                    Socket scUserRecepIEL  = clRecepIEL.getSocket();
+                    DataOutputStream dosur=new DataOutputStream(scUserRecepIEL.getOutputStream());
+                    dosur.writeUTF(nuevoMensaje);
+                }
+                break;
+            case "PLJ":
                 if(SocketServidor.listaClientes.get(protocolo.getIdentUserRecep()) != null)
                 {          
                     Clientes clRecepIEL=(Clientes)SocketServidor.listaClientes.get(protocolo.getIdentUserRecep());
                     Socket scUserRecepIEL  = clRecepIEL.getSocket();
                     DataOutputStream dosur=new DataOutputStream(scUserRecepIEL.getOutputStream());
-                    dosur.writeUTF(nuevoMensaje);
+                    String mensajeRegresoSj=protocolo.getEncabezado()+
+                                          protocolo.getIdentUserRecep()+
+                                          "INJ2"+
+                                          protocolo.getMensajeUser();
+                    dosur.writeUTF(nuevoMensaje + mensajeRegresoSj);
                 }
-                break;   
+                break;
             case "PUC":
                 if(SocketServidor.listaClientes.get(protocolo.getIdentUserRecep()) != null)
                 {

@@ -13,14 +13,14 @@ import java.net.Socket;
 public class Clientes {
     private Socket socket;
     private String estado;
-    private Cartas[] strCartas;
+    private Cartas[] strCartasOcupadas;
 
-    public Cartas[] getStrCartas() {
-        return strCartas;
+    public Cartas[] getStrCartasOcupadas() {
+        return strCartasOcupadas;
     }
 
-    public void setStrCartas(Cartas[] strCartas) {
-        this.strCartas = strCartas;
+    public void setStrCartasOcupadas(Cartas[] strCartas) {
+        this.strCartasOcupadas = strCartas;
     }
     /**
      * @return the socket
