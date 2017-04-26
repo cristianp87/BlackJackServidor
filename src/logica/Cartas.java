@@ -18,7 +18,7 @@ public class Cartas {
     private int valorCarta;
     private Cartas[] mazo = new Cartas[52];
     
-    public Cartas[] CrearMazo(String pCartasOcu){
+    public Cartas[] CrearMazo(Cartas[] pCartasOcu){
         String corazones = "Co";
         String diamantes = "Dm";
         String picas = "Pi";
@@ -31,11 +31,11 @@ public class Cartas {
             else if(aux == 2) tipoCarta = picas;
             else if(aux == 3) tipoCarta = treboles;
             for(int j = 1; j <= 13; j++){
-                mazo[i].setNombreCarta(j + tipoCarta);
-                if(pCartasOcu.contains(j + tipoCarta)){
-                    mazo[i].setEstadoCarta("1");
-                }else{
-                    mazo[i].setEstadoCarta("0");
+                mazo[i].setNombreCarta(tipoCarta +j);
+                mazo[i].setEstadoCarta("0");
+                for(int x= 0; x < pCartasOcu.length; x++){
+                    if(pCartasOcu[x].nombreCarta == mazo[i].nombreCarta)
+                        mazo[i].setEstadoCarta("1");                   
                 }
                 mazo[i].setValorCarta(j);               
             }
@@ -49,7 +49,6 @@ public class Cartas {
         Cartas vCarta = new Cartas();
         for(int i =0; i < oCartas.length; i++){
             vCarta = clMazo[(int)(Math.random()*52)];
-            int aux = 0;
             if(i==0) vCarta.setEstadoCarta("2");
             else vCarta.setEstadoCarta("1");
             oCartas[i] = vCarta;

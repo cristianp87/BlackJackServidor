@@ -9,6 +9,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.Set;
 
 /**
  *
@@ -96,21 +97,19 @@ public class ClienteServidor extends Thread {
                     Clientes clRecep=(Clientes)SocketServidor.listaClientes.get(protocolo.getIdentUserRecep());
                     Socket socketUserRecep  = clRecep.getSocket();  
                     Cartas clCartas = new Cartas();
-                    Cartas[] clMazo = clCartas.CrearMazo("");
+                    Cartas[] clMazo = clCartas.CrearMazo(clRecep.getStrCartasOcupadas());
                     Cartas[] clCartasRep = clCartas.RepartirInicioJuego(clMazo);
-                   // clMazo = clCartas.CrearMazo("");
-                   // clCartasRep = clCartas.RepartirInicioJuego(clMazo);
-                    DataOutputStream dosur=new DataOutputStream(socketUserRecep.getOutputStream());
-                    String mensajeRegreso=protocolo.getEncabezado()+
-                                          protocolo.getIdentUserConect() +
+                    this.AgregarCartasPedidasReceptor(clRecep, clCartasRep[0]);
+                    this.AgregarCartasPedidasReceptor(clRecep, clCartasRep[1]);
+                    DataOutputStream dosur=new DataOutputStream(socketUserRecep.getOutputStream());               
+                    String mensajeRegreso= protocolo.getIdentUserConect() +
+                                          "INJR"+
                                           clCartasRep[0].getNombreCarta() +
                                           clCartasRep[0].getEstadoCarta() +
                                           clCartasRep[0].getValorCarta()  +
                                           clCartasRep[1].getNombreCarta() +
                                           clCartasRep[1].getEstadoCarta() +
-                                          clCartasRep[1].getValorCarta()  +
-                                          "INJR"+
-                                          protocolo.getMensajeUser();
+                                          clCartasRep[1].getValorCarta();
                     dosur.writeUTF(mensajeRegreso);
                 }
                 
@@ -119,27 +118,27 @@ public class ClienteServidor extends Thread {
                     estadoMensajeInterno="INJ0";
                 else
                     estadoMensajeInterno="INJ1";
+                
                     Cartas clCartasEm = new Cartas();
                     Cartas[] clMazoEm = new Cartas[52];
                     Cartas[] clCartasRepEm = new Cartas[2];
-                    clMazoEm = clCartasEm.CrearMazo("");
+                    clMazoEm = clCartasEm.CrearMazo(clConect.getStrCartasOcupadas());
                     clCartasRepEm = clCartasEm.RepartirInicioJuego(clMazoEm);
+                    this.AgregarCartasPedidasEmisor(clConect, clCartasRepEm[0]);
+                    this.AgregarCartasPedidasEmisor(clConect, clCartasRepEm[1]);
                     DataOutputStream dosuc=new DataOutputStream(socketUserEmisor.getOutputStream());
-                    String mensajeRegreso=protocolo.getEncabezado()+
+                    String mensajeRegreso=protocolo.getIdentUserConect() +
                                           clCartasRepEm[0].getNombreCarta() +
                                           clCartasRepEm[0].getEstadoCarta() +
                                           clCartasRepEm[0].getValorCarta()  +
                                           clCartasRepEm[1].getNombreCarta() +
                                           clCartasRepEm[1].getEstadoCarta() +
                                           clCartasRepEm[1].getValorCarta()  +
-                                          protocolo.getIdentUserConect()
-                                          +estadoMensajeInterno+
-                                          protocolo.getMensajeUser();
-                    dosuc.writeUTF(mensajeRegreso);
-                
+                                          estadoMensajeInterno;
+                    dosuc.writeUTF(mensajeRegreso);               
                 break;
                 
-            case "PC":
+            case "PCT":
                
                 Clientes clConectpc =(Clientes)SocketServidor.listaClientes.get(protocolo.getIdentUserConect());
                 Socket socketUserEmisorpc = clConectpc.getSocket(); 
@@ -149,49 +148,37 @@ public class ClienteServidor extends Thread {
                     Clientes clRecep=(Clientes)SocketServidor.listaClientes.get(protocolo.getIdentUserRecep());
                     Socket socketUserRecep  = clRecep.getSocket();  
                     Cartas clCartas = new Cartas();
-                    Cartas[] clMazo = clCartas.CrearMazo(protocolo.getMensajeUser());
+                    Cartas[] clMazo = clCartas.CrearMazo(clRecep.getStrCartasOcupadas());
                     Cartas clCartasRep = clCartas.RepartirCarta(clMazo);
-                   // clMazo = clCartas.CrearMazo("");
-                   // clCartasRep = clCartas.RepartirInicioJuego(clMazo);
+                    this.AgregarCartasPedidasReceptor(clRecep, clCartasRep);
                     DataOutputStream dosur=new DataOutputStream(socketUserRecep.getOutputStream());
-                    String mensajeRegresoPC =protocolo.getEncabezado()+
-                                          protocolo.getIdentUserConect() +
+                    String mensajeRegresoPC =protocolo.getIdentUserConect() +
+                                          "CRR"+
                                           clCartasRep.getNombreCarta() +
                                           clCartasRep.getEstadoCarta() +
-                                          clCartasRep.getValorCarta()  +
-                                          "PCR"+
-                                          protocolo.getMensajeUser();
+                                          clCartasRep.getValorCarta();
                     dosur.writeUTF(mensajeRegresoPC);
                 }
                 
                 String estadoMensajeInternoPc ="";
                 if(SocketServidor.listaClientes.get(protocolo.getIdentUserRecep()) == null)
-                    estadoMensajeInternoPc ="PCE0";
+                    estadoMensajeInternoPc ="CE0";
                 else
-                    estadoMensajeInternoPc ="PCE1";
-                    Cartas clCartas = new Cartas();
-                    Cartas[] clMazopc = clCartas.CrearMazo(protocolo.getMensajeUser());
-                    Cartas clCartasRepPc = clCartas.RepartirCarta(clMazopc);
+                    estadoMensajeInternoPc ="CE1";
+                
+                    Cartas clCartasPCT = new Cartas();
+                    Cartas[] clMazopc = clCartasPCT.CrearMazo(clConectpc.getStrCartasOcupadas());
+                    Cartas clCartasRepPc = clCartasPCT.RepartirCarta(clMazopc);
+                    this.AgregarCartasPedidasEmisor(clConectpc, clCartasRepPc);
                     DataOutputStream dosucpc=new DataOutputStream(socketUserEmisorpc.getOutputStream());
-                    String mensajeRegresopc =protocolo.getEncabezado()+
+                    String mensajeRegresopc = protocolo.getIdentUserConect() +
+                                          estadoMensajeInternoPc +
                                           clCartasRepPc.getNombreCarta() +
                                           clCartasRepPc.getEstadoCarta() +
-                                          clCartasRepPc.getValorCarta()  +
-                                          protocolo.getIdentUserConect()
-                                          +estadoMensajeInternoPc+
-                                          protocolo.getMensajeUser();
+                                          clCartasRepPc.getValorCarta();
                     dosucpc.writeUTF(mensajeRegresopc);
                 
                 break;    
-            case "IEJ":
-                if(SocketServidor.listaClientes.get(protocolo.getIdentUserConect()) != null)
-                {          
-                    Clientes clRecepIEL=(Clientes)SocketServidor.listaClientes.get(protocolo.getIdentUserConect());
-                    Socket scUserRecepIEL  = clRecepIEL.getSocket();
-                    DataOutputStream dosur=new DataOutputStream(scUserRecepIEL.getOutputStream());
-                    dosur.writeUTF(nuevoMensaje);
-                }
-                break;
             case "PLJ":
                 if(SocketServidor.listaClientes.get(protocolo.getIdentUserRecep()) != null)
                 {          
@@ -204,23 +191,39 @@ public class ClienteServidor extends Thread {
                                           protocolo.getMensajeUser();
                     dosur.writeUTF(nuevoMensaje + mensajeRegresoSj);
                 }
-                break;
-            case "PUC":
-                if(SocketServidor.listaClientes.get(protocolo.getIdentUserRecep()) != null)
-                {
-                    Clientes clRecepPUC=(Clientes)SocketServidor.listaClientes.get(protocolo.getIdentUserRecep());
-                    dos.writeUTF(nuevoMensaje+
-                                 clRecepPUC.getEstado());
-                }else
-                    dos.writeUTF(nuevoMensaje+"2");
-                break;       
-                
-            case "IES":                
-                Clientes clIES=new Clientes();
-                clIES.setSocket(this.clienteServer);                
-                clIES.setEstado("0");
-                SocketServidor.listaClientes.put(protocolo.getIdentUserConect(),clIES);
-                break;                
+                break;        
+        }
+    }
+    
+    public void AgregarCartasPedidasEmisor(Clientes oCliente, Cartas oCarta){
+        if (SocketServidor.listaClientes.containsKey(protocolo.getIdentUserConect())){
+            Cartas[] lCartas = oCliente.getStrCartasOcupadas();
+            int lLongCartas = lCartas.length;
+            lCartas[lLongCartas].setNombreCarta(oCarta.getNombreCarta());
+            lCartas[lLongCartas].setEstadoCarta(oCarta.getEstadoCarta());
+            lCartas[lLongCartas].setValorCarta(oCarta.getValorCarta());
+            Clientes cl=new Clientes();
+            cl.setSocket(this.clienteServer);               
+            cl.setEstado("1");  
+            cl.setStrCartasOcupadas(lCartas);
+            SocketServidor.listaClientes.put(protocolo.getIdentUserConect(),cl);
+            System.out.println("cliente "+protocolo.getIdentUserConect() + ": " + cl.getStrCartasOcupadas());
+        }
+    }
+    
+    public void AgregarCartasPedidasReceptor(Clientes oCliente, Cartas oCarta){
+        if (SocketServidor.listaClientes.containsKey(protocolo.getIdentUserRecep())){
+            Cartas[] lCartas = oCliente.getStrCartasOcupadas();
+            int lLongCartas = lCartas.length;
+            lCartas[lLongCartas].setNombreCarta(oCarta.getNombreCarta());
+            lCartas[lLongCartas].setEstadoCarta(oCarta.getEstadoCarta());
+            lCartas[lLongCartas].setValorCarta(oCarta.getValorCarta());
+            Clientes cl=new Clientes();
+            cl.setSocket(this.clienteServer);               
+            cl.setEstado("2");  
+            cl.setStrCartasOcupadas(lCartas);
+            SocketServidor.listaClientes.put(protocolo.getIdentUserRecep(),cl);
+            System.out.println("cliente "+protocolo.getIdentUserRecep() + ": " + cl.getStrCartasOcupadas());
         }
     }
 }

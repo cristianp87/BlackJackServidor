@@ -30,7 +30,7 @@ package logica;
                 PARAMETROS:
                 YYYYMMDDHHMMSS -> Ultima fecha de conexion 
           1 ->  En linea
-    PC = Pedir Carta
+    PCT = Pedir Carta
           PARAMETROS:
           XXX -> Codigo del usuario al que se debe enviar el mensaje
           XXX.... -> Mensaje
@@ -72,33 +72,23 @@ public class Protocolo {
     private String estado;
     
     public String leerMensaje(String mensaje)
-    {
-        setEncabezado(mensaje.substring(0,4));       
-        setIdentUserConect(mensaje.substring(18,21));        
-        setComando(mensaje.substring(21,24));
+    {   
+        String[] verMensaje = mensaje.split("|");
+        setIdentUserConect(verMensaje[0]);        
+        setComando(verMensaje[1]);
         
         if(getComando().equals("INJ")) 
         {
-            this.setIdentUserRecep(mensaje.substring(24,27));
-            mensajeUser=mensaje.substring(27,mensaje.length());             
+            this.setIdentUserRecep(verMensaje[2]);             
         }else
-        if(getComando().equals("PC")) 
+        if(getComando().equals("PCT")) 
         {
-            this.setIdentUserRecep(mensaje.substring(24,27));
-            mensajeUser=mensaje.substring(27,mensaje.length());             
+            this.setIdentUserRecep(verMensaje[2]);        
         }else
-        if(getComando().equals("NPC")) {
-            this.setEstadoRecepMen(mensaje.substring(24,25));
-            mensajeUser=mensaje.substring(25,mensaje.length());  
+        if(getComando().equals("PLJ")) {
+            this.setEstadoRecepMen(verMensaje[2]);
             
-        }else
-        if(getComando().equals("IEL")) {
-            this.setIdentUserRecep(mensaje.substring(24,27));        
-        }else 
-        if(getComando().equals("IEJ")) {
-            this.setIdentUserRecep(mensaje.substring(24,27));        
-        }    
-        
+        }         
         return getComando();
     }
 
