@@ -64,8 +64,6 @@ package logica;
 
 public class Protocolo {
     private String identUserConect; 
-    private String mensajeUser;
-    private String encabezado;
     private String comando;
     private String identUserRecep;
     private String estadoRecepMen;
@@ -96,18 +94,6 @@ public class Protocolo {
      * Set's y Get's
      */
 
-    public String getMensajeUser() {
-        return mensajeUser;
-    }
-    public void setMensajeUser(String mensajeUser) {
-        this.mensajeUser = mensajeUser;
-    }
-    public String getEncabezado() {
-        return encabezado;
-    }
-    public void setEncabezado(String encabezado) {
-        this.encabezado = encabezado;
-    }
     
     public String getComando() {
         return comando;
