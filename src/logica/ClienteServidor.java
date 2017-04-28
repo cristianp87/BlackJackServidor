@@ -83,8 +83,7 @@ public class ClienteServidor extends Thread {
                     }
                 }          
                 DataOutputStream doScClSolREG=new DataOutputStream(clienteServer.getOutputStream());
-                String msjREG=protocolo.getEncabezado()+
-                              protocolo.getIdentUserConect()
+                String msjREG=protocolo.getIdentUserConect()
                               +"REG"+estadoReg;
                 doScClSolREG.writeUTF(msjREG);
                 
@@ -185,11 +184,9 @@ public class ClienteServidor extends Thread {
                     Clientes clRecepIEL=(Clientes)SocketServidor.listaClientes.get(protocolo.getIdentUserRecep());
                     Socket scUserRecepIEL  = clRecepIEL.getSocket();
                     DataOutputStream dosur=new DataOutputStream(scUserRecepIEL.getOutputStream());
-                    String mensajeRegresoSj=protocolo.getEncabezado()+
-                                          protocolo.getIdentUserRecep()+
-                                          "INJ2"+
-                                          protocolo.getMensajeUser();
-                    dosur.writeUTF(nuevoMensaje + mensajeRegresoSj);
+                    String mensajeRegresoSj= protocolo.getIdentUserRecep()+
+                                          "INJ2";
+                    dosur.writeUTF(mensajeRegresoSj);
                 }
                 break;        
         }
