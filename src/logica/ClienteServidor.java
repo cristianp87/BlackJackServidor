@@ -101,13 +101,13 @@ public class ClienteServidor extends Thread {
                     this.AgregarCartasPedidasReceptor(clRecep, clCartasRep[0]);
                     this.AgregarCartasPedidasReceptor(clRecep, clCartasRep[1]);
                     DataOutputStream dosur=new DataOutputStream(socketUserRecep.getOutputStream());               
-                    String mensajeRegreso= protocolo.getIdentUserConect() +
-                                          "INJR"+
-                                          clCartasRep[0].getNombreCarta() +
-                                          clCartasRep[0].getEstadoCarta() +
-                                          clCartasRep[0].getValorCarta()  +
-                                          clCartasRep[1].getNombreCarta() +
-                                          clCartasRep[1].getEstadoCarta() +
+                    String mensajeRegreso= protocolo.getIdentUserConect() + "|" +
+                                          "INJR"+ "|" +
+                                          clCartasRep[0].getNombreCarta() + "|" +
+                                          clCartasRep[0].getEstadoCarta() + "|" +
+                                          clCartasRep[0].getValorCarta()  + "|" +
+                                          clCartasRep[1].getNombreCarta() + "|" +
+                                          clCartasRep[1].getEstadoCarta() + "|" +
                                           clCartasRep[1].getValorCarta();
                     dosur.writeUTF(mensajeRegreso);
                 }
@@ -126,13 +126,13 @@ public class ClienteServidor extends Thread {
                     this.AgregarCartasPedidasEmisor(clConect, clCartasRepEm[0]);
                     this.AgregarCartasPedidasEmisor(clConect, clCartasRepEm[1]);
                     DataOutputStream dosuc=new DataOutputStream(socketUserEmisor.getOutputStream());
-                    String mensajeRegreso=protocolo.getIdentUserConect() +
-                                          clCartasRepEm[0].getNombreCarta() +
-                                          clCartasRepEm[0].getEstadoCarta() +
-                                          clCartasRepEm[0].getValorCarta()  +
-                                          clCartasRepEm[1].getNombreCarta() +
-                                          clCartasRepEm[1].getEstadoCarta() +
-                                          clCartasRepEm[1].getValorCarta()  +
+                    String mensajeRegreso=protocolo.getIdentUserConect() + "|" +
+                                          clCartasRepEm[0].getNombreCarta() + "|" +
+                                          clCartasRepEm[0].getEstadoCarta() + "|" +
+                                          clCartasRepEm[0].getValorCarta()  + "|" +
+                                          clCartasRepEm[1].getNombreCarta() + "|" +
+                                          clCartasRepEm[1].getEstadoCarta() + "|" +
+                                          clCartasRepEm[1].getValorCarta()  + "|" +
                                           estadoMensajeInterno;
                     dosuc.writeUTF(mensajeRegreso);               
                 break;
@@ -151,10 +151,10 @@ public class ClienteServidor extends Thread {
                     Cartas clCartasRep = clCartas.RepartirCarta(clMazo);
                     this.AgregarCartasPedidasReceptor(clRecep, clCartasRep);
                     DataOutputStream dosur=new DataOutputStream(socketUserRecep.getOutputStream());
-                    String mensajeRegresoPC =protocolo.getIdentUserConect() +
-                                          "CRR"+
-                                          clCartasRep.getNombreCarta() +
-                                          clCartasRep.getEstadoCarta() +
+                    String mensajeRegresoPC =protocolo.getIdentUserConect() + "|" +
+                                          "CRR"+ "|" +
+                                          clCartasRep.getNombreCarta() + "|" +
+                                          clCartasRep.getEstadoCarta() + "|" +
                                           clCartasRep.getValorCarta();
                     dosur.writeUTF(mensajeRegresoPC);
                 }
@@ -170,11 +170,11 @@ public class ClienteServidor extends Thread {
                     Cartas clCartasRepPc = clCartasPCT.RepartirCarta(clMazopc);
                     this.AgregarCartasPedidasEmisor(clConectpc, clCartasRepPc);
                     DataOutputStream dosucpc=new DataOutputStream(socketUserEmisorpc.getOutputStream());
-                    String mensajeRegresopc = protocolo.getIdentUserConect() +
-                                          estadoMensajeInternoPc +
-                                          clCartasRepPc.getNombreCarta() +
-                                          clCartasRepPc.getEstadoCarta() +
-                                          clCartasRepPc.getValorCarta();
+                    String mensajeRegresopc = protocolo.getIdentUserConect() + "|" +
+                                          estadoMensajeInternoPc + "|" +
+                                          clCartasRepPc.getNombreCarta() + "|" +
+                                          clCartasRepPc.getEstadoCarta() + "|" +
+                                          clCartasRepPc.getValorCarta(); 
                     dosucpc.writeUTF(mensajeRegresopc);
                 
                 break;    
@@ -184,7 +184,7 @@ public class ClienteServidor extends Thread {
                     Clientes clRecepIEL=(Clientes)SocketServidor.listaClientes.get(protocolo.getIdentUserRecep());
                     Socket scUserRecepIEL  = clRecepIEL.getSocket();
                     DataOutputStream dosur=new DataOutputStream(scUserRecepIEL.getOutputStream());
-                    String mensajeRegresoSj= protocolo.getIdentUserRecep()+
+                    String mensajeRegresoSj= protocolo.getIdentUserRecep()+ "|" +
                                           "INJ2";
                     dosur.writeUTF(mensajeRegresoSj);
                 }
