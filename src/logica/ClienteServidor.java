@@ -155,7 +155,9 @@ public class ClienteServidor extends Thread {
                                           "CRR"+ "|" +
                                           clCartasRep.getNombreCarta() + "|" +
                                           clCartasRep.getEstadoCarta() + "|" +
-                                          clCartasRep.getValorCarta();
+                                          clCartasRep.getValorCarta() + "|" +
+                                          clCartas.juegoBlackJack(clRecep.getStrCartasOcupadas()) + "|" +
+                                          clCartas.getSumaCartas();
                     dosur.writeUTF(mensajeRegresoPC);
                 }
                 
@@ -174,19 +176,25 @@ public class ClienteServidor extends Thread {
                                           estadoMensajeInternoPc + "|" +
                                           clCartasRepPc.getNombreCarta() + "|" +
                                           clCartasRepPc.getEstadoCarta() + "|" +
-                                          clCartasRepPc.getValorCarta(); 
+                                          clCartasRepPc.getValorCarta() + "|" +
+                                          clCartasPCT.juegoBlackJack(clConectpc.getStrCartasOcupadas()) + "|" +
+                                          clCartasPCT.getSumaCartas(); 
                     dosucpc.writeUTF(mensajeRegresopc);
                 
                 break;    
             case "PLJ":
                 if(SocketServidor.listaClientes.get(protocolo.getIdentUserRecep()) != null)
                 {          
-                    Clientes clRecepIEL=(Clientes)SocketServidor.listaClientes.get(protocolo.getIdentUserRecep());
-                    Socket scUserRecepIEL  = clRecepIEL.getSocket();
-                    DataOutputStream dosur=new DataOutputStream(scUserRecepIEL.getOutputStream());
+                    Clientes clConectPLJ =(Clientes)SocketServidor.listaClientes.get(protocolo.getIdentUserConect());
+                    Socket scUserEmisorPLJ = clConectPLJ.getSocket(); 
+                    DataOutputStream dosurPLJ =new DataOutputStream(scUserEmisorPLJ.getOutputStream());
+                    if(clConectPLJ.getEstado() == "2"){
+                        String algo = "0";
+                    }
                     String mensajeRegresoSj= protocolo.getIdentUserRecep()+ "|" +
                                           "INJ2";
-                    dosur.writeUTF(mensajeRegresoSj);
+                    
+                    dosurPLJ.writeUTF(mensajeRegresoSj);
                 }
                 break;        
         }

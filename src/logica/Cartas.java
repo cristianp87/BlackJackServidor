@@ -17,6 +17,15 @@ public class Cartas {
     private String estadoCarta;
     private int valorCarta;
     private Cartas[] mazo = new Cartas[52];
+    private int sumaCartas = 0;
+
+    public int getSumaCartas() {
+        return sumaCartas;
+    }
+
+    public void setSumaCartas(int sumaCartas) {
+        this.sumaCartas = sumaCartas;
+    }
     
     public Cartas[] CrearMazo(Cartas[] pCartasOcu){
         String corazones = "Co";
@@ -37,7 +46,11 @@ public class Cartas {
                     if(pCartasOcu[x].nombreCarta == mazo[i].nombreCarta)
                         mazo[i].setEstadoCarta("1");                   
                 }
-                mazo[i].setValorCarta(j);               
+                if(j > 10){
+                    mazo[i].setValorCarta(10); 
+                }else{
+                    mazo[i].setValorCarta(j);               
+                }
             }
             aux++;
         }
@@ -69,6 +82,41 @@ public class Cartas {
             vCarta.setEstadoCarta("1");
         }
         return vCarta;
+    }
+     
+    public int juegoBlackJack(Cartas[] oCartas){
+        int sumaBJ = 0;
+        int as = 0;
+        int estadoJuego = 0;
+        for(int i=0; i < oCartas.length; i++){
+            
+            if(oCartas[i].getValorCarta() == 1 && as == 0){
+                oCartas[i].setValorCarta(11);
+                as++;
+            }
+            sumaBJ = sumaBJ + oCartas[i].getValorCarta();
+            if(sumaBJ == 21){
+                 estadoJuego = 1;
+            }else{
+                if(sumaBJ > 21){
+                    if(as > 0){
+                        sumaBJ = sumaBJ - 10;
+                        if(sumaBJ > 21){
+                            estadoJuego = 2;
+                        }
+                        else{
+                            estadoJuego = 0;
+                        }
+                    }
+                     estadoJuego = 2;
+                }else{
+                    estadoJuego = 0;
+                }
+            }
+            
+        }
+        this.setSumaCartas(sumaBJ);
+        return estadoJuego;
     }
 
     public int getValorCarta() {
