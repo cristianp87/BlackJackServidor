@@ -5,11 +5,12 @@
  */
 package logica;
 
+import entidades.Juego;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.Set;
+import recursos.enumeraciones.EnumComando;
 
 /**
  *
@@ -21,6 +22,8 @@ public class ClienteServidor extends Thread {
     private DataInputStream dis;
     private Protocolo protocolo=new Protocolo();
     private String nuevoMensaje;
+    private Juego juego;
+    private Logica logica;
     
     public ClienteServidor(Socket socket) throws IOException
     {
@@ -37,8 +40,8 @@ public class ClienteServidor extends Thread {
             try {
                 nuevoMensaje="";
                 nuevoMensaje=dis.readUTF();      
-                protocolo.leerMensaje(nuevoMensaje);
-                ejecutarActividad();
+                //ejecutarActividad();
+                ejemplo();
             } catch (IOException ex) {
                 leer=false;
             }
@@ -200,6 +203,19 @@ public class ClienteServidor extends Thread {
         }
     }
     
+    public void ejemplo(){
+        
+        //Ejemplo INI|8766|John|corazones/2%2%D,picas/3%3%T|A|8345|Cristian|trebol/8%8%D,picas/4%4%T
+        Juego juegoInicial = getLogica().convierteMensaje(nuevoMensaje);
+        if(juegoInicial.getComando().equalsIgnoreCase(EnumComando.REG.name())){
+            if(getLogica().getListaUsuario().isEmpty()){
+                getLogica().getListaUsuario().put(juegoInicial.getIdUsuario(), juegoInicial.getNombreJugador());
+            }else{
+                getLogica().getListaUsuario().put(juegoInicial.getIdUsuario(), juegoInicial.getNombreJugador());
+            }
+        }
+    }
+    
     public void AgregarCartasPedidasEmisor(Clientes oCliente, Cartas oCarta){
         if (SocketServidor.listaClientes.containsKey(protocolo.getIdentUserConect())){
             Cartas[] lCartas = oCliente.getStrCartasOcupadas();
@@ -231,4 +247,13 @@ public class ClienteServidor extends Thread {
             System.out.println("cliente "+protocolo.getIdentUserRecep() + ": " + cl.getStrCartasOcupadas());
         }
     }
+
+    public Logica getLogica() {
+        if(logica==null){
+            logica = new Logica();
+        }
+        return logica;
+    }
+    
+    
 }
