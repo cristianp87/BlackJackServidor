@@ -13,6 +13,7 @@ public class Carta {
     private String nombreCarta;
     private String estadoCarta;
     private String valorCarta;
+    
 
     public String getNombreCarta() {
         return nombreCarta;

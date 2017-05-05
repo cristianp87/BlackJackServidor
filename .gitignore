@@ -1,3 +1,4 @@
 /dist/
 *.netbeans_automatic_build
 build/classes/.netbeans_automatic_build
+/build/

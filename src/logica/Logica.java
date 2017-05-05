@@ -10,6 +10,7 @@ import entidades.Cliente;
 import entidades.Juego;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.StringTokenizer;
 
 /**
@@ -19,6 +20,8 @@ import java.util.StringTokenizer;
 public class Logica {
 
     private ArrayList<Cliente> jugadores;
+    private ArrayList<Carta> mazo;
+    private int suma;
 
     public Juego convierteMensaje(String mensaje) {
         System.out.println("Mensaje" + mensaje);
@@ -75,14 +78,14 @@ public class Logica {
                 .concat(objeto.getNombreJugador().concat("|")).concat(recorreArray(objeto.getJuego())).concat("|")
                 .concat(objeto.getEstado().concat("|")).concat(objeto.getIdUsuarioEnemigo()).concat("|").concat(objeto.getNombreJugadorEnemigo())
                 .concat("|").concat(recorreArray(objeto.getCartasEnemigo()));
-        System.out.println("mensaje"+mensaje);
+        System.out.println("mensaje" + mensaje);
         return mensaje;
     }
 
     public String recorreArray(ArrayList<Carta> listaCartas) {
         String mensaje = "";
         for (Carta item : listaCartas) {
-            mensaje += mensaje.concat(item.getNombreCarta().concat("%")).concat(item.getValorCarta().concat("%")).concat(item.getEstadoCarta().concat(","));
+            mensaje = mensaje.concat(item.getNombreCarta().concat("%")).concat(item.getValorCarta().concat("%")).concat(item.getEstadoCarta().concat(","));
         }
         if ("".equalsIgnoreCase(mensaje)) {
             mensaje = "null";
@@ -112,27 +115,94 @@ public class Logica {
 
     public ArrayList<Carta> reparteCartasInicio() {
         ArrayList<Carta> carta = new ArrayList<>();
-        Carta c = new Carta();
-        c.setEstadoCarta("T");
-        c.setNombreCarta("corazones/4");
-        c.setValorCarta("4");
-        carta.add(c);
-        Carta cA = new Carta();
-        cA.setEstadoCarta("D");
-        cA.setNombreCarta("corazones/8");
-        cA.setValorCarta("4");
-        carta.add(cA);
+        Random random = new Random();
+        int index = random.nextInt(mazo.size());
+        carta.add(mazo.get(index));
+        mazo.remove(index);
+        index = random.nextInt(mazo.size());
+        mazo.get(index).setEstadoCarta("D");
+        carta.add(mazo.get(index));
+        mazo.remove(index);
         return carta;
     }
-    
-    public ArrayList<Carta> pideCarta(ArrayList<Carta> cartas){
-        Carta cA = new Carta();
-        cA.setEstadoCarta("D");
-        cA.setNombreCarta("picas/8");
-        cA.setValorCarta("4");
-        cartas.add(cA);
+
+    public ArrayList<Carta> pideCarta(ArrayList<Carta> cartas) {
+        Random random = new Random();
+        int index = random.nextInt(mazo.size());
+        mazo.get(index).setEstadoCarta("D");
+        cartas.add(mazo.get(index));
+        mazo.remove(index);
         return cartas;
     }
+
+    public void llenaMazo() {
+        if (mazo == null) {
+            mazo = new ArrayList<>();
+        }
+        llenaPinta("corazones/");
+        llenaPinta("diamantes/");
+        llenaPinta("picas/");
+        llenaPinta("trebol/");
+
+    }
+
+    public void llenaPinta(String pinta) {
+        for (int i = 2; i <= 11; i++) {
+            Carta c = new Carta();
+            if (i == 10) {
+                c.setNombreCarta(pinta + i);
+                c.setValorCarta("" + i);
+                c.setEstadoCarta("T");
+                mazo.add(c);
+                c.setNombreCarta(pinta + "J");
+                c.setValorCarta("" + i);
+                c.setEstadoCarta("T");
+                mazo.add(c);
+                c.setNombreCarta(pinta + "Q");
+                c.setValorCarta("" + i);
+                c.setEstadoCarta("T");
+                mazo.add(c);
+                c.setNombreCarta(pinta + "K");
+                c.setValorCarta("" + i);
+                c.setEstadoCarta("T");
+                mazo.add(c);
+            } else if (i == 11) {
+                c.setNombreCarta(pinta + "A");
+                c.setValorCarta("" + i);
+                c.setEstadoCarta("T");
+                mazo.add(c);
+            } else {
+                c.setNombreCarta(pinta + i);
+                c.setValorCarta("" + i);
+                c.setEstadoCarta("T");
+                mazo.add(c);
+            }
+
+        }
+    }
+
+    public ArrayList<Carta> verificaPuntaje(ArrayList<Carta> cartas) {
+        for (Carta item : cartas) {
+            suma += Integer.parseInt(item.getValorCarta());
+        }
+        if (suma > 21) {
+            cartas = verificaAS(cartas);
+        }
+        return cartas;
+    }
+
+    public ArrayList<Carta> verificaAS(ArrayList<Carta> cartas) {
+        for (Carta item : cartas) {
+            if (item.getNombreCarta().contains("A")) {
+                item.setValorCarta("1");
+                cartas = verificaPuntaje(cartas);
+                break;
+            }
+        }
+        return cartas;
+    }
+
+
 
     public ArrayList<Cliente> getJugadores() {
         if (jugadores == null) {
@@ -143,6 +213,22 @@ public class Logica {
 
     public void setJugadores(ArrayList<Cliente> jugadores) {
         this.jugadores = jugadores;
+    }
+
+    public ArrayList<Carta> getMazo() {
+        return mazo;
+    }
+
+    public void setMazo(ArrayList<Carta> mazo) {
+        this.mazo = mazo;
+    }
+
+    public int getSuma() {
+        return suma;
+    }
+
+    public void setSuma(int suma) {
+        this.suma = suma;
     }
 
 }

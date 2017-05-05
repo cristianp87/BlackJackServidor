@@ -1,4 +1,5 @@
 
+import entidades.Carta;
 import entidades.Cliente;
 import entidades.Juego;
 import java.io.IOException;
@@ -15,6 +16,7 @@ public class SocksServer {
     public static ArrayList<Cliente> listaCliente;
     public static Juego juego1;
     public static Juego juego2;
+    public static ArrayList<Carta> mazo;
 
     public SocksServer() throws IOException {
         ResourceBundle rb = ResourceBundle.getBundle("recursos/archivos/configuracion/configuracion");
