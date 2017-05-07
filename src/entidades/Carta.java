@@ -12,7 +12,7 @@ package entidades;
 public class Carta {
     private String nombreCarta;
     private String estadoCarta;
-    private String valorCarta;
+    private int valorCarta;
     
 
     public String getNombreCarta() {
@@ -31,13 +31,15 @@ public class Carta {
         this.estadoCarta = estadoCarta;
     }
 
-    public String getValorCarta() {
+    public int getValorCarta() {
         return valorCarta;
     }
 
-    public void setValorCarta(String valorCarta) {
+    public void setValorCarta(int valorCarta) {
         this.valorCarta = valorCarta;
     }
+
+
     
     
 }

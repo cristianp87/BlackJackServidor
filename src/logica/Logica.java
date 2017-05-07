@@ -12,6 +12,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.StringTokenizer;
+import recursos.enumeraciones.EnumComando;
 
 /**
  *
@@ -22,6 +23,9 @@ public class Logica {
     private ArrayList<Cliente> jugadores;
     private ArrayList<Carta> mazo;
     private int suma;
+    private Juego jugador1;
+    private Juego jugador2;
+    private boolean terminaJuego;
 
     public Juego convierteMensaje(String mensaje) {
         System.out.println("Mensaje" + mensaje);
@@ -66,7 +70,7 @@ public class Logica {
         StringTokenizer st = new StringTokenizer(mensajeCarta, "%");
         while (st.hasMoreElements()) {
             c.setNombreCarta(st.nextToken());
-            c.setValorCarta(st.nextToken());
+            c.setValorCarta(Integer.parseInt(st.nextToken()));
             c.setEstadoCarta(st.nextToken());
         }
         return c;
@@ -85,7 +89,7 @@ public class Logica {
     public String recorreArray(ArrayList<Carta> listaCartas) {
         String mensaje = "";
         for (Carta item : listaCartas) {
-            mensaje = mensaje.concat(item.getNombreCarta().concat("%")).concat(item.getValorCarta().concat("%")).concat(item.getEstadoCarta().concat(","));
+            mensaje = mensaje.concat(item.getNombreCarta().concat("%")).concat(String.valueOf(item.getValorCarta()).concat("%")).concat(item.getEstadoCarta().concat(","));
         }
         if ("".equalsIgnoreCase(mensaje)) {
             mensaje = "null";
@@ -117,6 +121,7 @@ public class Logica {
         ArrayList<Carta> carta = new ArrayList<>();
         Random random = new Random();
         int index = random.nextInt(mazo.size());
+        mazo.get(index).setEstadoCarta("T");
         carta.add(mazo.get(index));
         mazo.remove(index);
         index = random.nextInt(mazo.size());
@@ -149,60 +154,143 @@ public class Logica {
     public void llenaPinta(String pinta) {
         for (int i = 2; i <= 11; i++) {
             Carta c = new Carta();
-            if (i == 10) {
-                c.setNombreCarta(pinta + i);
-                c.setValorCarta("" + i);
-                c.setEstadoCarta("T");
-                mazo.add(c);
-                c.setNombreCarta(pinta + "J");
-                c.setValorCarta("" + i);
-                c.setEstadoCarta("T");
-                mazo.add(c);
-                c.setNombreCarta(pinta + "Q");
-                c.setValorCarta("" + i);
-                c.setEstadoCarta("T");
-                mazo.add(c);
-                c.setNombreCarta(pinta + "K");
-                c.setValorCarta("" + i);
-                c.setEstadoCarta("T");
-                mazo.add(c);
-            } else if (i == 11) {
-                c.setNombreCarta(pinta + "A");
-                c.setValorCarta("" + i);
-                c.setEstadoCarta("T");
-                mazo.add(c);
-            } else {
-                c.setNombreCarta(pinta + i);
-                c.setValorCarta("" + i);
-                c.setEstadoCarta("T");
-                mazo.add(c);
+            c.setEstadoCarta("T");
+            switch (i) {
+                case 10:
+                    c.setNombreCarta(pinta + i);
+                    c.setValorCarta(i);
+                    mazo.add(c);
+                    c.setNombreCarta(pinta + "J");
+                    c.setValorCarta(i);
+                    mazo.add(c);
+                    c.setNombreCarta(pinta + "Q");
+                    c.setValorCarta(i);
+                    mazo.add(c);
+                    c.setNombreCarta(pinta + "K");
+                    c.setValorCarta(i);
+                    mazo.add(c);
+                    break;
+                case 11:
+                    c.setNombreCarta(pinta + "A");
+                    c.setValorCarta(i);
+                    mazo.add(c);
+                    break;
+                default:
+                    c.setNombreCarta(pinta + i);
+                    c.setValorCarta(i);
+                    mazo.add(c);
+                    break;
             }
 
         }
     }
 
-    public ArrayList<Carta> verificaPuntaje(ArrayList<Carta> cartas) {
+    public void verificaPuntaje(ArrayList<Carta> cartas) {
         for (Carta item : cartas) {
-            suma += Integer.parseInt(item.getValorCarta());
+            suma += item.getValorCarta();
         }
         if (suma > 21) {
-            cartas = verificaAS(cartas);
+            verificaAS(cartas);
         }
-        return cartas;
     }
 
-    public ArrayList<Carta> verificaAS(ArrayList<Carta> cartas) {
+    public void verificaAS(ArrayList<Carta> cartas) {
+        boolean asSi = false;
         for (Carta item : cartas) {
-            if (item.getNombreCarta().contains("A")) {
-                item.setValorCarta("1");
-                cartas = verificaPuntaje(cartas);
-                break;
+            if (asSi == false) {
+                if (item.getNombreCarta().contains("A")) {
+                    item.setValorCarta(1);
+                    asSi = true;
+                    break;
+                }
             }
         }
-        return cartas;
+        if (asSi) {
+            suma = 0;
+            verificaPuntaje(cartas);
+            System.out.println("entro" + suma);
+        }
     }
 
+    public void iniciaJuego() {
+        jugador1.setJuego(reparteCartasInicio());
+        jugador2.setJuego(reparteCartasInicio());
+        jugador1.setComando(EnumComando.JUG.name());
+        jugador1.setEstado("A");
+        jugador2.setComando(EnumComando.REG.name());
+        jugador2.setEstado("A");
+        llenaDatosJugadores();
+    }
 
+    public void iniciaPideCarta() {
+        jugador1.setJuego(pideCarta(jugador1.getJuego()));
+        verificaPuntaje(jugador1.getJuego());
+        if (getSuma() > 21) {
+
+            jugador1.setComando(EnumComando.PER.name());
+            jugador1.setEstado("I");
+            jugador2.setComando(EnumComando.GAN.name());
+            jugador2.setEstado("I");
+            terminaJuego = true;
+        } else {
+            jugador1.setComando(EnumComando.JUG.name());
+            jugador1.setEstado("A");
+            jugador2.setComando(EnumComando.REG.name());
+            jugador2.setEstado("A");
+        }
+        llenaDatosJugadores();
+    }
+
+    public void iniciaPideCartaJug2() {
+        jugador2.setJuego(pideCarta(jugador2.getJuego()));
+        verificaPuntaje(jugador2.getJuego());
+        if (getSuma() > 21) {
+            jugador2.setComando(EnumComando.PER.name());
+            jugador2.setEstado("I");
+            jugador1.setComando(EnumComando.GAN.name());
+            jugador1.setEstado("I");
+            terminaJuego = true;
+        } else {
+            jugador2.setComando(EnumComando.JUG.name());
+            jugador2.setEstado("A");
+            jugador1.setComando(EnumComando.REG.name());
+            jugador1.setEstado("A");
+        }
+        llenaDatosJugadores();
+    }
+
+    public void plantarseJug1() {
+        jugador1.setComando(EnumComando.REG.name());
+        jugador1.setEstado("A");
+        jugador2.setComando(EnumComando.JUG.name());
+        jugador2.setEstado("A");
+        llenaDatosJugadores();
+    }
+
+    public void plantarseJug2() {
+        jugador1.setEstado("A");
+        jugador2.setEstado("A");
+        llenaDatosJugadores();
+        if (jugador2.getSumaCartas() > jugador1.getSumaCartas()) {
+            jugador2.setComando(EnumComando.GAN.name());
+            jugador1.setComando(EnumComando.PER.name());
+        } else if (jugador2.getSumaCartas() < jugador1.getSumaCartas()) {
+            jugador2.setComando(EnumComando.PER.name());
+            jugador1.setComando(EnumComando.GAN.name());
+        } else if (jugador2.getSumaCartas() == jugador1.getSumaCartas()) {
+            jugador2.setComando(EnumComando.EMP.name());
+            jugador1.setComando(EnumComando.EMP.name());
+        }
+    }
+
+    public void llenaDatosJugadores() {
+        jugador1.setCartasEnemigo(jugador2.getJuego());
+        jugador1.setNombreJugadorEnemigo(jugador2.getNombreJugador());
+        jugador1.setIdUsuarioEnemigo(jugador2.getIdUsuario());
+        jugador2.setCartasEnemigo(jugador1.getJuego());
+        jugador2.setNombreJugadorEnemigo(jugador1.getNombreJugador());
+        jugador2.setIdUsuarioEnemigo(jugador1.getIdUsuario());
+    }
 
     public ArrayList<Cliente> getJugadores() {
         if (jugadores == null) {
@@ -229,6 +317,30 @@ public class Logica {
 
     public void setSuma(int suma) {
         this.suma = suma;
+    }
+
+    public Juego getJugador1() {
+        return jugador1;
+    }
+
+    public void setJugador1(Juego jugador1) {
+        this.jugador1 = jugador1;
+    }
+
+    public Juego getJugador2() {
+        return jugador2;
+    }
+
+    public void setJugador2(Juego jugador2) {
+        this.jugador2 = jugador2;
+    }
+
+    public boolean isTerminaJuego() {
+        return terminaJuego;
+    }
+
+    public void setTerminaJuego(boolean terminaJuego) {
+        this.terminaJuego = terminaJuego;
     }
 
 }

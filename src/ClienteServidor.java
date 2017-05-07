@@ -39,6 +39,7 @@ public class ClienteServidor extends Thread {
                 mensaje = dis.readUTF();
                 leeMensaje();
             } catch (Exception e) {
+                e.printStackTrace();
                 bandera = false;
             }
         }
@@ -48,6 +49,7 @@ public class ClienteServidor extends Thread {
         Juego juego = getLogica().convierteMensaje(mensaje);
         switch (juego.getComando()) {
             case "REG":
+                //añade a la lista de clientes
                 SocksServer.listaCliente.add(getLogica().verificaJugadores(juego, clienteServer));
                 if (SocksServer.listaCliente.size() == 1) {
                     SocksServer.juego1 = juego;
@@ -61,25 +63,13 @@ public class ClienteServidor extends Thread {
                     getLogica().setMazo(SocksServer.mazo);
                 }
                 if (SocksServer.listaCliente.size() == 2) {
-                    SocksServer.listaCliente.get(0).setListaCarta(getLogica().reparteCartasInicio());
-                    SocksServer.listaCliente.get(1).setListaCarta(getLogica().reparteCartasInicio());
+                    getLogica().setJugador1(SocksServer.juego1);
+                    getLogica().setJugador2(SocksServer.juego2);
+                    getLogica().iniciaJuego();
+                    SocksServer.juego1 = getLogica().getJugador1();
+                    SocksServer.juego2 = getLogica().getJugador2();
                     SocksServer.mazo = getLogica().getMazo();
-                    SocksServer.juego1.setCartasEnemigo(SocksServer.listaCliente.get(1).getListaCarta());
-                    SocksServer.juego1.setComando("JUG");
-                    SocksServer.juego1.setEstado("A");
-                    SocksServer.juego1.setJuego(SocksServer.listaCliente.get(0).getListaCarta());
-                    SocksServer.juego1.setNombreJugadorEnemigo(SocksServer.juego2.getNombreJugador());
-                    SocksServer.juego1.setIdUsuarioEnemigo(SocksServer.juego2.getIdUsuario());
-                    SocksServer.juego2.setCartasEnemigo(SocksServer.listaCliente.get(0).getListaCarta());
-                    SocksServer.juego2.setComando("REG");
-                    SocksServer.juego2.setEstado("A");
-                    SocksServer.juego2.setJuego(SocksServer.listaCliente.get(1).getListaCarta());
-                    SocksServer.juego2.setNombreJugadorEnemigo(SocksServer.juego1.getNombreJugador());
-                    SocksServer.juego2.setIdUsuarioEnemigo(SocksServer.juego1.getIdUsuario());
-                    dos = new DataOutputStream(SocksServer.listaCliente.get(0).getSocket().getOutputStream());
-                    dos.writeUTF(getLogica().convierteObjetoJuego(SocksServer.juego1));
-                    dos2 = new DataOutputStream(SocksServer.listaCliente.get(1).getSocket().getOutputStream());
-                    dos2.writeUTF(getLogica().convierteObjetoJuego(SocksServer.juego2));
+                    enviaMensajeClientes();
                 }
                 break;
             case "PED":
@@ -87,105 +77,76 @@ public class ClienteServidor extends Thread {
                 getLogica().setSuma(0);
                 if (SocksServer.listaCliente.get(0).getIdusuario().equalsIgnoreCase(juego.getIdUsuario())) {
                     SocksServer.juego1 = juego;
-                    SocksServer.juego1.setJuego(getLogica().pideCarta(SocksServer.juego1.getJuego()));
-                    SocksServer.mazo = getLogica().getMazo();
-                    getLogica().verificaPuntaje(SocksServer.juego1.getJuego());
-                    if (getLogica().getSuma() > 21) {
-                        SocksServer.juego1.setComando("PER");
-                        SocksServer.juego1.setEstado("I");
-                        SocksServer.juego2.setCartasEnemigo(SocksServer.juego1.getJuego());
-                        SocksServer.juego2.setComando("GAN");
-                        SocksServer.juego2.setEstado("I");
-                        SocksServer.juego2.setJuego(SocksServer.juego1.getCartasEnemigo());
-                        SocksServer.juego2.setNombreJugadorEnemigo(SocksServer.juego1.getNombreJugador());
-                        SocksServer.juego2.setIdUsuarioEnemigo(SocksServer.juego1.getIdUsuario());
-                    } else {
-                        SocksServer.juego1.setComando("JUG");
-                        SocksServer.juego1.setEstado("A");
-                        SocksServer.juego2.setCartasEnemigo(SocksServer.juego1.getJuego());
-                        SocksServer.juego2.setComando("REG");
-                        SocksServer.juego2.setEstado("A");
-                        SocksServer.juego2.setJuego(SocksServer.juego1.getCartasEnemigo());
-                        SocksServer.juego2.setNombreJugadorEnemigo(SocksServer.juego1.getNombreJugador());
-                        SocksServer.juego2.setIdUsuarioEnemigo(SocksServer.juego1.getIdUsuario());
-                    }
-
+                    getLogica().setJugador1(SocksServer.juego1);
+                    getLogica().setJugador2(SocksServer.juego2);
+                    getLogica().iniciaPideCarta();
                 }
                 if (SocksServer.listaCliente.get(1).getIdusuario().equalsIgnoreCase(juego.getIdUsuario())) {
                     SocksServer.juego2 = juego;
-                    SocksServer.juego2.setJuego(getLogica().pideCarta(SocksServer.juego2.getJuego()));
-                    SocksServer.mazo = getLogica().getMazo();
-                    getLogica().verificaPuntaje(SocksServer.juego2.getJuego());
-                    if (getLogica().getSuma() > 21) {
-                        SocksServer.juego2.setComando("PER");
-                        SocksServer.juego2.setEstado("I");
-                        SocksServer.juego1.setCartasEnemigo(SocksServer.juego1.getJuego());
-                        SocksServer.juego1.setComando("GAN");
-                        SocksServer.juego1.setEstado("I");
-                        SocksServer.juego1.setJuego(SocksServer.juego2.getCartasEnemigo());
-                        SocksServer.juego1.setNombreJugadorEnemigo(SocksServer.juego1.getNombreJugador());
-                        SocksServer.juego1.setIdUsuarioEnemigo(SocksServer.juego1.getIdUsuario());
-                    } else {
-                        SocksServer.juego2.setComando("JUG");
-                        SocksServer.juego2.setEstado("A");
-                        SocksServer.juego1.setCartasEnemigo(SocksServer.juego2.getJuego());
-                        SocksServer.juego1.setComando("REG");
-                        SocksServer.juego1.setEstado("A");
-                        SocksServer.juego1.setJuego(SocksServer.juego2.getCartasEnemigo());
-                        SocksServer.juego1.setNombreJugadorEnemigo(SocksServer.juego2.getNombreJugador());
-                        SocksServer.juego1.setIdUsuarioEnemigo(SocksServer.juego2.getIdUsuario());
-                    }
+                    getLogica().setJugador2(SocksServer.juego2);
+                    getLogica().setJugador1(SocksServer.juego1);
+                    getLogica().iniciaPideCartaJug2();
+
                 }
-                dos = new DataOutputStream(SocksServer.listaCliente.get(0).getSocket().getOutputStream());
-                dos.writeUTF(getLogica().convierteObjetoJuego(SocksServer.juego1));
-                dos2 = new DataOutputStream(SocksServer.listaCliente.get(1).getSocket().getOutputStream());
-                dos2.writeUTF(getLogica().convierteObjetoJuego(SocksServer.juego2));
+                if (getLogica().isTerminaJuego()) {
+                    SocksServer.listaCliente.get(0).setEstado("I");
+                    SocksServer.listaCliente.get(1).setEstado("I");
+                }
+                SocksServer.mazo = getLogica().getMazo();
+                enviaMensajeClientes();
                 break;
 
             case "PLA":
                 if (SocksServer.listaCliente.get(0).getIdusuario().equalsIgnoreCase(juego.getIdUsuario())) {
                     SocksServer.juego1 = juego;
-                    SocksServer.juego1.setComando("REG");
-                    SocksServer.juego1.setEstado("A");
-                    SocksServer.juego2.setComando("JUG");
-                    SocksServer.juego2.setEstado("A");
-                    SocksServer.juego2.setJuego(SocksServer.juego1.getCartasEnemigo());
-                    SocksServer.juego2.setNombreJugadorEnemigo(SocksServer.juego1.getNombreJugador());
-                    SocksServer.juego2.setIdUsuarioEnemigo(SocksServer.juego1.getIdUsuario());
-                    SocksServer.juego2.setCartasEnemigo(SocksServer.juego1.getJuego());
-                    SocksServer.juego2.setIdJugador(SocksServer.juego1.getIdUsuarioEnemigo());
-                    SocksServer.juego2.setIdUsuario(SocksServer.juego1.getIdUsuarioEnemigo());
-                    SocksServer.juego2.setNombreJugador(SocksServer.juego1.getNombreJugadorEnemigo());
+                    getLogica().setJugador1(SocksServer.juego1);
+                    getLogica().setJugador2(SocksServer.juego2);
+                    getLogica().plantarseJug1();
                 }
                 if (SocksServer.listaCliente.get(1).getIdusuario().equalsIgnoreCase(juego.getIdUsuario())) {
                     SocksServer.juego2 = juego;
-                    SocksServer.juego2.setEstado("A");
-                    SocksServer.juego1.setEstado("A");
-                    SocksServer.juego1.setJuego(SocksServer.juego2.getCartasEnemigo());
-                    SocksServer.juego1.setNombreJugadorEnemigo(SocksServer.juego2.getNombreJugador());
-                    SocksServer.juego1.setIdUsuarioEnemigo(SocksServer.juego2.getIdUsuario());
-                    SocksServer.juego1.setCartasEnemigo(SocksServer.juego2.getJuego());
-                    SocksServer.juego1.setIdJugador(SocksServer.juego2.getIdUsuarioEnemigo());
-                    SocksServer.juego1.setIdUsuario(SocksServer.juego2.getIdUsuarioEnemigo());
-                    SocksServer.juego1.setNombreJugador(SocksServer.juego2.getNombreJugadorEnemigo());
-                    if (SocksServer.juego2.getSumaCartas() > SocksServer.juego2.getSumaCartasEnemigo()) {
-                        SocksServer.juego2.setComando("GAN");
-                        SocksServer.juego1.setComando("PER");
-                    } else if (SocksServer.juego2.getSumaCartas() < SocksServer.juego2.getSumaCartasEnemigo()) {
-                        SocksServer.juego2.setComando("PER");
-                        SocksServer.juego1.setComando("GAN");
-                    } else {
-                        SocksServer.juego2.setComando("EMP");
-                        SocksServer.juego1.setComando("EMP");
-                    }
+                    getLogica().setJugador1(SocksServer.juego1);
+                    getLogica().setJugador2(SocksServer.juego2);
+                    getLogica().plantarseJug2();
+                    SocksServer.mazo = null;
+                    SocksServer.listaCliente.get(0).setEstado("I");
+                    SocksServer.listaCliente.get(1).setEstado("I");
 
                 }
-                dos = new DataOutputStream(SocksServer.listaCliente.get(0).getSocket().getOutputStream());
-                dos.writeUTF(getLogica().convierteObjetoJuego(SocksServer.juego1));
-                dos2 = new DataOutputStream(SocksServer.listaCliente.get(1).getSocket().getOutputStream());
-                dos2.writeUTF(getLogica().convierteObjetoJuego(SocksServer.juego2));
+                enviaMensajeClientes();
+                break;
+
+            case "NUE":
+                if (juego.getIdUsuario().equalsIgnoreCase(SocksServer.listaCliente.get(0).getIdusuario())) {
+                    SocksServer.listaCliente.get(0).setEstado("A");
+                }
+                if (juego.getIdUsuario().equalsIgnoreCase(SocksServer.listaCliente.get(1).getIdusuario())) {
+                    SocksServer.listaCliente.get(1).setEstado("A");
+                }
+
+                if (SocksServer.listaCliente.get(0).getEstado().equalsIgnoreCase("A") && SocksServer.listaCliente.get(1).getEstado().equalsIgnoreCase("A")) {
+                    if (SocksServer.mazo == null) {
+                        getLogica().llenaMazo();
+                    } else {
+                        getLogica().setMazo(SocksServer.mazo);
+                    }
+                    getLogica().setJugador1(SocksServer.juego1);
+                    getLogica().setJugador2(SocksServer.juego2);
+                    getLogica().iniciaJuego();
+                    SocksServer.juego1 = getLogica().getJugador1();
+                    SocksServer.juego2 = getLogica().getJugador2();
+                    SocksServer.mazo = getLogica().getMazo();
+                    enviaMensajeClientes();
+                }
                 break;
         }
+    }
+
+    public void enviaMensajeClientes() throws IOException {
+        dos = new DataOutputStream(SocksServer.listaCliente.get(0).getSocket().getOutputStream());
+        dos.writeUTF(getLogica().convierteObjetoJuego(SocksServer.juego1));
+        dos2 = new DataOutputStream(SocksServer.listaCliente.get(1).getSocket().getOutputStream());
+        dos2.writeUTF(getLogica().convierteObjetoJuego(SocksServer.juego2));
     }
 
     public Logica getLogica() {

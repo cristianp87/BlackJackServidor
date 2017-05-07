@@ -16,6 +16,7 @@ public class Cliente {
     private Socket socket;
     private String idusuario;
     private ArrayList<Carta> listaCarta;
+    private String estado;
 
     public Socket getSocket() {
         return socket;
@@ -42,5 +43,15 @@ public class Cliente {
     public void setListaCarta(ArrayList<Carta> listaCarta) {
         this.listaCarta = listaCarta;
     }
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
+    }
+    
+    
     
 }

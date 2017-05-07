@@ -78,7 +78,7 @@ public class Juego {
     public int getSumaCartas() {
         if(!this.getJuego().isEmpty()){
             this.getJuego().forEach((item) -> {
-                sumaCartas+=Integer.parseInt(item.getValorCarta());
+                sumaCartas+=item.getValorCarta();
             });
         }
         return sumaCartas;
@@ -100,7 +100,7 @@ public class Juego {
         if(!this.getCartasEnemigo().isEmpty()){
             this.getCartasEnemigo().forEach((item)-> {
                 if("D".equalsIgnoreCase(item.getEstadoCarta())){
-                    sumaCartasEnemigo+=Integer.parseInt(item.getValorCarta());
+                    sumaCartasEnemigo+=item.getValorCarta();
                 }           
         });
         }
