@@ -199,9 +199,11 @@ public class Logica {
         for (Carta item : cartas) {
             if (asSi == false) {
                 if (item.getNombreCarta().contains("A")) {
-                    item.setValorCarta(1);
-                    asSi = true;
-                    break;
+                    if(item.getValorCarta() != 1){
+                        item.setValorCarta(1);
+                        asSi = true;
+                        break;
+                    }
                 }
             }
         }
